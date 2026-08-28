@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+artifacts/
+appsettings.*.local.json
+
+# Dados operacionais e artefatos que não devem subir ao repositório
+carga/
+docs/
+exemplo/
+simulacao/
+tests/
+tools/_publish-scd.zip

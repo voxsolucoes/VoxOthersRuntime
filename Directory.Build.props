@@ -1,0 +1,34 @@
+﻿<Project>
+
+  <!--
+    Configuração comum a todos os projetos da solução.
+    Centralizada aqui para que cada .csproj fique mínimo e para que uma
+    mudança de padrão (versão da linguagem, rigor de warnings) valha para
+    a solução inteira sem edição repetida.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!--
+      Warning vira erro: o critério de conclusão da Fase 0 exige build
+      limpo, e warning tolerado hoje é bug aceito amanhã.
+    -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+
+    <!--
+      Workstation GC: este serviço é I/O-bound, não CPU-bound.
+      Server GC alocaria heap por núcleo e multiplicaria a memória
+      residente sem ganho de throughput (ver AD-1 / seção 8 da arquitetura).
+    -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

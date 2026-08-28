@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    Projeto único do serviço: host, ingestão, pipeline, persistência e entrega.
+    A separação interna é por PASTA, não por projeto (AD-2) — refatorar pasta
+    é barato, refatorar fronteira de projeto não é.
+
+    SDK Web porque o webhook (Fase 2) e os health checks precisam do pipeline
+    HTTP. O mesmo processo continua hospedando os BackgroundServices.
+  -->
+  <PropertyGroup>
+    <RootNamespace>VoxOthers.Runtime</RootNamespace>
+    <UserSecretsId>voxothers-runtime</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VoxOthers.Contracts\VoxOthers.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+
+    <!--
+      Firebird, e nao SQL Server: a base do Vox e Firebird 4.0 — conferido
+      contra a base de homologacao. O provedor 13.0.0 e o primeiro que tem
+      net10.0 e EF Core 10; as versoes 12 e abaixo param no net8.0.
+    -->
+    <PackageReference Include="FirebirdSql.EntityFrameworkCore.Firebird" Version="13.0.0" />
+
+    <!-- Serviço do Windows: ciclo de vida controlado pelo SCM (stop gracioso,
+         Event Log). Equivalente moderno do ServiceBase + InstallUtil do Others
+         atual. -->
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.0" />
+  </ItemGroup>
+
+  <!--
+    Bilhete .GRF: referencia direta as DLLs em lib/, por caminho RELATIVO ao
+    repositorio. Sao .NET Framework 4.6.1 consumidas a partir do .NET 10 — o
+    que foi verificado gerando bilhete de verdade, nao presumido.
+
+    Sao duas, e nao as cinco que o build do projeto antigo arrasta:
+
+      RegBDLib                 gera o bilhete.
+      VoxMediaServer.Business  NAO e usada — o Others grava bilhete em texto,
+                               sem criptografia. Ainda assim precisa estar
+                               presente: o JIT compila SaveTicket inteiro antes
+                               de executa-lo, e o ramo de criptografia do metodo
+                               cita o tipo Engine. Sem o arquivo em disco, o
+                               metodo nem chega a rodar.
+
+    VoxConfigurationManager, VoxLogger e log4net ficaram DE FORA de proposito.
+    Nenhuma e carregada para gerar bilhete, e VoxConfigurationManager depende de
+    System.ServiceModel (WCF), que nao existe no .NET 10. Mante-las por seguranca
+    faria o oposto: esconderia essa incompatibilidade ate alguem encostar num
+    caminho que precise dela. Ausentes, o erro aparece na hora e aponta o
+    assembly certo.
+  -->
+  <ItemGroup>
+    <Reference Include="RegBDLib">
+      <HintPath>..\..\lib\RegBDLib.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="VoxMediaServer.Business">
+      <HintPath>..\..\lib\VoxMediaServer.Business.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    Abre os membros internos para o projeto de teste. É o que permite exercitar
+    uma varredura de pasta isolada sem promover o método a público: a superfície
+    pública continua sendo só o que o serviço realmente oferece.
+  -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="VoxOthers.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Contrato oficial entre o Builder (e backends de terceiros) e o Runtime.
+    É projeto separado por uma razão concreta: será publicado como pacote
+    NuGet para que ninguém precise reimplementar o formato. Sem esse motivo,
+    seria apenas uma pasta dentro do Runtime.
+
+    Regra: este projeto NÃO pode ganhar dependência de nada. Quem o consome
+    é código de terceiro, que não deve herdar as escolhas de infraestrutura
+    do Runtime.
+  -->
+  <PropertyGroup>
+    <PackageId>VoxOthers.Contracts</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Vox Soluções</Authors>
+    <Description>Contrato oficial CentralizeEntity para integração com o Vox Others Runtime.</Description>
+  </PropertyGroup>
+
+</Project>
